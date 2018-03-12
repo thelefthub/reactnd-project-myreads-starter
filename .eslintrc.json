@@ -1,0 +1,20 @@
+{
+    "extends": "standard",
+    "parser": "babel-eslint",
+    "rules": {
+        "semi": [1, "always"],
+        "no-unused-vars": [1, { "vars": "local", "args": "none" }],
+        "space-before-function-paren": [2, "never"],
+        "quotes": [0, "single", { "avoidEscape": true, "allowTemplateLiterals": true }],
+        "padded-blocks": [0],
+        "indent": [0],
+        "no-undef": [1],
+        "key-spacing" : [0],
+        "curly" : [1],
+        "no-multiple-empty-lines" : [0],
+        "no-trailing-spaces" : [0]
+    },
+    "plugins": [
+        "react"
+    ]
+}
