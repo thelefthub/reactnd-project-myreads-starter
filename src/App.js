@@ -3,18 +3,12 @@ import React from 'react'
 import './App.css'
 import { Route } from 'react-router-dom';
 import ListShelves from './listShelves';
+import SearchBooks from './searchBooks';
 import * as BooksAPI from './BooksAPI';
 import Shelf from './models/shelf';
 
 class BooksApp extends React.Component {
   state = {
-    /**
-     * TODO: Instead of using this state variable to keep track of which page
-     * we're on, use the URL in the browser's address bar. This will ensure that
-     * users can use the browser's back and forward buttons to navigate between
-     * pages, as well as provide a good URL they can bookmark and share.
-     */
-    // showSearchPage: false,
     shelves : []
   }
 
@@ -23,14 +17,14 @@ class BooksApp extends React.Component {
   }
 
   setShelves() {
-    let currentlyReading = new Shelf(1, 'Currently Reading');
-    let wantToRead = new Shelf(2, 'Want To Read');
-    let read = new Shelf(3, 'Read');
+    let currentlyReading = new Shelf('currentlyReading', 'Currently Reading');
+    let wantToRead = new Shelf('wantToRead', 'Want To Read');
+    let read = new Shelf('read', 'Read');
     let shelves = [];
 
     BooksAPI.getAll().then((books) => {
       books.map((book) => {
-        console.log(book.shelf);
+        // console.log(book);
         switch (book.shelf) {
           case 'currentlyReading':
             currentlyReading.addBook(book);
@@ -48,12 +42,76 @@ class BooksApp extends React.Component {
     });
   }
 
+  moveBook = (e, book) => {
+    let target = e.target.value;
+
+    if (target === 'none') {
+      alert('Please choose a valid shelf');
+    } else {
+      // e.persist();
+      BooksAPI.update(book, e.target.value).then((response) => {
+        console.log('response ', response);
+        this.updateShelves(book, target);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    }
+
+
+  }
+
+  updateShelves = (book, newShelf) => {
+    console.log('move ' + book.title + ' from ' + book.shelf + ' to ' + newShelf);
+    this.setState((prevState) => ({
+      shelves : prevState.shelves.map(shelf => {
+        if (shelf.id === book.shelf) {
+          shelf.books.map(shelfBook => {
+            if (shelfBook.id === book.id) {
+              shelfBook.shelf = newShelf;
+              shelf.removeBook(book);
+            }
+            return shelfBook;
+          });
+        }
+        if (shelf.id === newShelf) {
+          shelf.addBook(book);
+        }
+        return shelf;
+      })
+    }));
+
+  }
+
+  queryBooks = (e) => {
+    if (e.key === 'Enter') {
+      console.log('validate' + e.target.value);
+      BooksAPI.search(e.target.value).then((response) => {
+        console.log('queryResponse ', response);
+
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    }
+
+
+  }
+
   render() {
     return (
       <div className="app">
         <Route exact path="/" render={() => (
           <ListShelves
             shelves = {this.state.shelves}
+            onBookMove = {this.moveBook}
+
+            />
+          )}/>
+        <Route path="/search" render={() => (
+          <SearchBooks
+            onSearch = {this.queryBooks}
+
 
             />
           )}/>

@@ -6,8 +6,8 @@ import BookComponent from './bookComponent';
 
 class ListShelves extends Component {
   static propTypes = {
-    shelves : PropTypes.array.isRequired
-    // onDeleteContact : PropTypes.func.isRequired
+    shelves : PropTypes.array.isRequired,
+    onBookMove : PropTypes.func.isRequired
   };
 
   state = {
@@ -23,9 +23,9 @@ class ListShelves extends Component {
 
 
   render() {
-    console.log('my shelves: ', this.props.shelves);
+    // console.log('my shelves: ', this.props.shelves);
 
-    const {shelves} = this.props;
+    const {shelves, onBookMove} = this.props;
 
     return (
       <div className="list-books">
@@ -33,16 +33,16 @@ class ListShelves extends Component {
           <h1>MyReads</h1>
         </div>
         <div className="list-books-content">
-          {shelves.map((shelve) => (
-            <div key={shelve.id} className="bookshelf">
-              <h2 className="bookshelf-title">{shelve.title}</h2>
+          {shelves.map((shelf) => (
+            <div key={shelf.id} className="bookshelf">
+              <h2 className="bookshelf-title">{shelf.title}</h2>
               <div className="bookshelf-books">
                 <ol className="books-grid">
-                  {shelve.books.map((book) => (
+                  {shelf.books.map((book) => (
                     <li key={book.id}>
                       <BookComponent
                       book = {book}
-
+                      onBookMove = {onBookMove}
                       />
                   </li>
                   ))}
@@ -54,7 +54,7 @@ class ListShelves extends Component {
 
         </div>
         <div className="open-search">
-
+          <Link to="/search">Add a book</Link>
         </div>
       </div>
 

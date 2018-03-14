@@ -4,6 +4,12 @@ import PropTypes from 'prop-types';
 import './App.css';
 
 class BookComponent extends Component {
+  static propTypes = {
+    book : PropTypes.object.isRequired,
+    onBookMove : PropTypes.func.isRequired
+  };
+
+
   state = {
     // currentlyReading: [],
     // wantToRead: [],
@@ -11,15 +17,15 @@ class BookComponent extends Component {
   }
 
   render() {
-    const {book} = this.props;
-    console.log('my book: ', book);
+    const {book, onBookMove} = this.props;
+    // console.log('my book: ', book);
 
     return (
       <div className="book">
         <div className="book-top">
           <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.image})` }}></div>
           <div className="book-shelf-changer">
-            <select>
+            <select value={book.shelf} onChange={(e) => onBookMove(e, book)}>
               <option value="none" disabled>Move to...</option>
               <option value="currentlyReading">Currently Reading</option>
               <option value="wantToRead">Want to Read</option>

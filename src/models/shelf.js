@@ -8,8 +8,20 @@ class Shelf {
   }
 
   addBook(book) {
-    let b = new Book(book.industryIdentifiers[0].identifier, book.title, book.authors, book.imageLinks.thumbnail);
-    this.books.push(b);
+    if (book instanceof Book) {
+      this.books.push(book);
+    } else {
+      let b = new Book(book.id, book.title, book.authors, book.imageLinks.thumbnail, book.shelf);
+      this.books.push(b);
+    }
+
+  }
+
+  removeBook(book) {
+    let index = this.books.indexOf(book);
+    if (index > -1) {
+    this.books.splice(index, 1);
+}
   }
 }
 
