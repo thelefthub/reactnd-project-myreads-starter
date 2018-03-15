@@ -18,7 +18,6 @@ class BookComponent extends Component {
 
   render() {
     const {book, onBookMove} = this.props;
-    // console.log('my book: ', book);
 
     return (
       <div className="book">
@@ -26,7 +25,7 @@ class BookComponent extends Component {
           <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.image})` }}></div>
           <div className="book-shelf-changer">
             <select value={book.shelf} onChange={(e) => onBookMove(e, book)}>
-              <option value="none" disabled>Move to...</option>
+              <option value="move" disabled>Move to...</option>
               <option value="currentlyReading">Currently Reading</option>
               <option value="wantToRead">Want to Read</option>
               <option value="read">Read</option>

@@ -6,13 +6,16 @@ import ListShelves from './listShelves';
 import SearchBooks from './searchBooks';
 import * as BooksAPI from './BooksAPI';
 import Shelf from './models/shelf';
+import Book from './models/book';
 
 class BooksApp extends React.Component {
   state = {
-    shelves : []
+    shelves : [],
+    results : []
   }
 
   componentDidMount() {
+    console.log('hallo')
     this.setShelves();
   }
 
@@ -63,6 +66,27 @@ class BooksApp extends React.Component {
 
   updateShelves = (book, newShelf) => {
     console.log('move ' + book.title + ' from ' + book.shelf + ' to ' + newShelf);
+    // add new books
+    if (book.shelf === 'none') {
+      book.shelf = newShelf;
+      this.setState((prevState) => ({
+        shelves : prevState.shelves.map(shelf => {
+          if (shelf.id === newShelf.id) {
+            shelf.addBook(book);
+          }
+          return shelf;
+        })//,
+        // results : prevState.results.map(resultBook => {
+        //   if (resultBook.id === book.id) {
+        //     return book;
+        //   } else {
+        //     return resultBook;
+        //   }
+        //
+        // })
+      }));
+    }
+    // move existing books
     this.setState((prevState) => ({
       shelves : prevState.shelves.map(shelf => {
         if (shelf.id === book.shelf) {
@@ -88,14 +112,42 @@ class BooksApp extends React.Component {
       console.log('validate' + e.target.value);
       BooksAPI.search(e.target.value).then((response) => {
         console.log('queryResponse ', response);
+        if (response.error) {
+          alert('Book not found!');
+        } else {
+          this.setBookQueryState(response);
+        }
 
       })
       .catch((err) => {
         console.log(err);
       });
     }
+  }
 
+  setBookQueryState = (result) => {
+    // console.log(result);
+    let results = result.map((book) => {
+      let b = new Book(book.id, book.title, book.authors, book.imageLinks.thumbnail, 'none');
+      this.state.shelves.forEach((shelf) => {
+        shelf.books.forEach((shelfBook) => {
+          if (shelfBook.id === book.id) {
+            b.shelf = shelfBook.shelf;
+          }
+        });
+      });
+      return b;
+    });
+    // console.log('query state', results);
+    this.setState({results});
 
+  }
+
+  // is this required???
+  clearResults() {
+    this.setState = {
+    results: []
+    };
   }
 
   render() {
@@ -110,14 +162,16 @@ class BooksApp extends React.Component {
           )}/>
         <Route path="/search" render={() => (
           <SearchBooks
+            results = {this.state.results}
             onSearch = {this.queryBooks}
-
+            onBookMove = {this.moveBook}
+            onClear = {this.clearResults}
 
             />
           )}/>
 
       </div>
-    )
+    );
   }
 }
 
