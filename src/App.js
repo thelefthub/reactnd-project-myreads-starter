@@ -15,10 +15,10 @@ class BooksApp extends React.Component {
   }
 
   componentDidMount() {
-    console.log('hallo')
     this.setShelves();
   }
 
+  //set the initial shelf state
   setShelves() {
     let currentlyReading = new Shelf('currentlyReading', 'Currently Reading');
     let wantToRead = new Shelf('wantToRead', 'Want To Read');
@@ -45,6 +45,7 @@ class BooksApp extends React.Component {
     });
   }
 
+  //move a book to the supplied shelf
   moveBook = (e, book) => {
     let target = e.target.value;
 
@@ -63,7 +64,7 @@ class BooksApp extends React.Component {
 
 
   }
-
+  //update shelves based on user preferences
   updateShelves = (book, newShelf) => {
     console.log('move ' + book.title + ' from ' + book.shelf + ' to ' + newShelf);
     // add new books
@@ -107,48 +108,53 @@ class BooksApp extends React.Component {
 
   }
 
+  //use user input to search books via the BooksAPI
   queryBooks = (e) => {
-    if (e.key === 'Enter') {
-      console.log('validate' + e.target.value);
-      BooksAPI.search(e.target.value).then((response) => {
-        console.log('queryResponse ', response);
-        if (response.error) {
-          alert('Book not found!');
-        } else {
-          this.setBookQueryState(response);
-        }
 
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    }
+    console.log('validate' + e.target.value);
+    BooksAPI.search(e.target.value).then((response) => {
+      // console.log('queryResponse ', response);
+      if (response == null) {
+        console.log('Book not found!');
+        this.setBookQueryState();
+      } else if (response.error) {
+        console.log('queryResponse ', response);
+        this.setBookQueryState();
+      } else {
+        this.setBookQueryState(response);
+      }
+
+    })
+    .catch((err) => {
+      console.log('error: ', err);
+    });
+
   }
 
+  //set the correct state after a query
   setBookQueryState = (result) => {
-    // console.log(result);
-    let results = result.map((book) => {
-      let b = new Book(book.id, book.title, book.authors, book.imageLinks.thumbnail, 'none');
-      this.state.shelves.forEach((shelf) => {
-        shelf.books.forEach((shelfBook) => {
-          if (shelfBook.id === book.id) {
-            b.shelf = shelfBook.shelf;
-          }
+    let results = [];
+
+    if (result != null) {
+      results = result.map((book) => {
+        let b = new Book(book.id, book.title, book.authors, book.imageLinks.thumbnail, 'none');
+        this.state.shelves.forEach((shelf) => {
+          shelf.books.forEach((shelfBook) => {
+            if (shelfBook.id === book.id) {
+              b.shelf = shelfBook.shelf;
+            }
+          });
         });
+        return b;
       });
-      return b;
-    });
-    // console.log('query state', results);
+      // console.log('query state', results);
+    }
+
     this.setState({results});
 
   }
 
-  // is this required???
-  clearResults() {
-    this.setState = {
-    results: []
-    };
-  }
+
 
   render() {
     return (
