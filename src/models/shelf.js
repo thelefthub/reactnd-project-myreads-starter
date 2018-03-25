@@ -11,17 +11,14 @@ class Shelf {
     if (book instanceof Book) {
       this.books.push(book);
     } else {
-      let b = new Book(book.id, book.title, book.authors, book.imageLinks.thumbnail, book.shelf);
+      let b = new Book(book.id, book.title, book.authors ? book.authors : '', book.imageLinks ? book.imageLinks.thumbnail : null, book.shelf);
       this.books.push(b);
     }
 
   }
 
   removeBook(book) {
-    let index = this.books.indexOf(book);
-    if (index > -1) {
-    this.books.splice(index, 1);
-}
+    this.books = this.books.filter(shelfBook => shelfBook.id !== book.id);
   }
 }
 

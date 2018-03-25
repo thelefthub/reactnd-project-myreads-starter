@@ -48,19 +48,15 @@ class BooksApp extends React.Component {
   //move a book to the supplied shelf
   moveBook = (e, book) => {
     let target = e.target.value;
+            // e.persist();
+    BooksAPI.update(book, target).then((response) => {
+      console.log('response ', response);
+      this.updateShelves(book, target);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 
-    if (target === 'none') {
-      alert('Please choose a valid shelf');
-    } else {
-      // e.persist();
-      BooksAPI.update(book, e.target.value).then((response) => {
-        console.log('response ', response);
-        this.updateShelves(book, target);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    }
 
 
   }
@@ -76,15 +72,15 @@ class BooksApp extends React.Component {
             shelf.addBook(book);
           }
           return shelf;
-        })//,
-        // results : prevState.results.map(resultBook => {
-        //   if (resultBook.id === book.id) {
-        //     return book;
-        //   } else {
-        //     return resultBook;
-        //   }
-        //
-        // })
+        }),
+        results : prevState.results.map(resultBook => {
+          if (resultBook.id === book.id) {
+            book.shelf = newShelf;
+            return book;
+          } else {
+            return resultBook;
+          }
+        })
       }));
     }
     // move existing books
@@ -103,6 +99,14 @@ class BooksApp extends React.Component {
           shelf.addBook(book);
         }
         return shelf;
+      }),
+      results : prevState.results.map(resultBook => {
+        if (resultBook.id === book.id) {
+          book.shelf = newShelf;
+          return book;
+        } else {
+          return resultBook;
+        }
       })
     }));
 
@@ -111,7 +115,7 @@ class BooksApp extends React.Component {
   //use user input to search books via the BooksAPI
   queryBooks = (e) => {
 
-    console.log('validate' + e.target.value);
+    // console.log('validate' + e.target.value);
     BooksAPI.search(e.target.value).then((response) => {
       // console.log('queryResponse ', response);
       if (response == null) {
@@ -137,7 +141,9 @@ class BooksApp extends React.Component {
 
     if (result != null) {
       results = result.map((book) => {
-        let b = new Book(book.id, book.title, book.authors, book.imageLinks.thumbnail, 'none');
+
+        let b = new Book(book.id, book.title, book.authors ? book.authors : '', book.imageLinks ? book.imageLinks.thumbnail : null, 'none');
+
         this.state.shelves.forEach((shelf) => {
           shelf.books.forEach((shelfBook) => {
             if (shelfBook.id === book.id) {
@@ -147,11 +153,15 @@ class BooksApp extends React.Component {
         });
         return b;
       });
-      // console.log('query state', results);
     }
 
     this.setState({results});
 
+  }
+
+  //clear search results on return
+  clearResults = () => {
+    this.setState({results : []});
   }
 
 

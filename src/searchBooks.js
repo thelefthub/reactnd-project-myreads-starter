@@ -7,21 +7,15 @@ import BookComponent from './bookComponent';
 class SearchBooks extends Component {
   static propTypes = {
     results : PropTypes.array.isRequired,
-    onSearch : PropTypes.func.isRequired
+    onSearch : PropTypes.func.isRequired,
+    onBookMove : PropTypes.func.isRequired
   };
 
   state = {
-    // results: []
-    // wantToRead: [],
-    // read: []
+
   }
 
-  // componentDidMount() {
-  //
-  // }
-
-
-
+  
   render() {
     const {results, onSearch, onBookMove, onClear} = this.props;
 
@@ -29,7 +23,7 @@ class SearchBooks extends Component {
     return (
       <div className="search-books">
         <div className="search-books-bar">
-          <Link className="close-search" to="/">Close</Link>
+          <Link className="close-search" to="/" onClick={onClear}>Close</Link>
           <div className="search-books-input-wrapper">
             <input type="text" onChange={onSearch} placeholder="Search by title or author"/>
           </div>
